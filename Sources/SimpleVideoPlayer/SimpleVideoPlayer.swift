@@ -207,7 +207,12 @@ extension SimpleVideoPlayer {
     func didSetFilePath() {
         guard let filePath else { return }
         let url: URL
-        url = URL(filePath: filePath)
+        if #available(iOS 16.0, *) {
+            url = URL(filePath: filePath)
+        } else {
+            // Fallback on earlier versions
+            url = URL(fileURLWithPath: filePath)
+        }
         let item = AVPlayerItem(url: url)
         playerItem = item
     }
@@ -334,10 +339,18 @@ extension SimpleVideoPlayer: PlayerMaskViewDelegate {
     
     func toggleFullScreen() {
         let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-        if windowScene?.interfaceOrientation != .portrait {
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+        if #available(iOS 16, *) {
+            if windowScene?.interfaceOrientation != .portrait {
+                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+            } else {
+                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeLeft))
+            }
         } else {
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeLeft))
+            if windowScene?.interfaceOrientation != .portrait {
+                UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+            } else {
+                UIDevice.current.setValue(UIInterfaceOrientation.landscapeLeft.rawValue, forKey: "orientation")
+            }
         }
     }
     
@@ -361,7 +374,11 @@ extension SimpleVideoPlayer: PlayerMaskViewDelegate {
         } else {
             lockInterfaceOrientation = nil
         }
-        setNeedsUpdateOfSupportedInterfaceOrientations()
+        if #available(iOS 16.0, *) {
+            setNeedsUpdateOfSupportedInterfaceOrientations()
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     func changeSpeed(_ speed: Float) {
