@@ -27,6 +27,7 @@ public class SimpleVideoPlayer: UIViewController {
     /// 私有化 init 方法
     private init() {
         super.init(nibName: nil, bundle: nil)
+        modalPresentationStyle = .fullScreen
     }
     
     /// 用视频播放链接构建

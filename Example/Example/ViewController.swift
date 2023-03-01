@@ -26,7 +26,6 @@ class ViewController: UIViewController, SimpleVideoPlayerDelegate {
 //        print(videoPath)
 //        let playerVC = SimpleVideoPlayer(filePath: videoPath)
         let playerVC = SimpleVideoPlayer(urlStr: "http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8")
-        playerVC.modalPresentationStyle = .fullScreen
         playerVC.delegate = self
         present(playerVC, animated: true)
     }
