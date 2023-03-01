@@ -5,11 +5,14 @@ import PackageDescription
 
 let package = Package(
     name: "SimpleVideoPlayer",
+    platforms: [
+        .iOS(.v16)
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "SimpleVideoPlayer",
-            targets: ["SimpleVideoPlayer"]),
+            targets: ["SimpleVideoPlayer"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -20,9 +23,10 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "SimpleVideoPlayer",
-            dependencies: []),
+            dependencies: [],
+            path: "Sources"),
         .testTarget(
             name: "SimpleVideoPlayerTests",
-            dependencies: ["SimpleVideoPlayer"]),
+            dependencies: ["SimpleVideoPlayer"])
     ]
 )
