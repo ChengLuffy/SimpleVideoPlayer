@@ -36,6 +36,7 @@ class PlayerMaskView: UIView {
                 centerBtn.isHidden = false
                 goforwardBtn.isHidden = false
                 gobackwardBtn.isHidden = false
+                delegate?.playAction()
             } else if videoIsReady == 0 {
                 loadingView.startAnimating()
                 centerBtn.isHidden = true
@@ -227,7 +228,7 @@ extension PlayerMaskView {
     /// 控制屏幕按钮显示或隐藏
     /// - Parameter hidden: 是否隐藏
     private func setControlsHidden(_ hidden: Bool = true, but subview: UIView? = nil) {
-        for view in subviews where view != subview {
+        for view in subviews where view != subview && view != loadingView {
             if hidden {
                 UIView.animate(withDuration: 0.25) {
                     view.alpha = 0
