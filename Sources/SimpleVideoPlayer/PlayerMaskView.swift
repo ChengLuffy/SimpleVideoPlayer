@@ -238,7 +238,7 @@ extension PlayerMaskView {
                     view.alpha = 1
                 }
             } else {
-                if !(view == pipBtn && !AVPictureInPictureController.isPictureInPictureSupported()) {
+                if !(view == pipBtn && !AVPictureInPictureController.isPictureInPictureSupported()) && !(view == centerBtn && loadingView.isAnimating) {
                     view.alpha = 0
                     view.isHidden = false
                     UIView.animate(withDuration: 0.25) {
