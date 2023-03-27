@@ -20,6 +20,7 @@ protocol PlayerMaskViewDelegate: AnyObject {
     func changeSpeed(_ speed: Float)
     func goforward()
     func gobackward()
+    func getPlayerStatus() -> PlayerStatus
 }
 
 class PlayerMaskView: UIView {
@@ -36,7 +37,9 @@ class PlayerMaskView: UIView {
                 centerBtn.isHidden = false
                 goforwardBtn.isHidden = false
                 gobackwardBtn.isHidden = false
-                delegate?.playAction()
+                if delegate?.getPlayerStatus() != .pause {
+                    delegate?.playAction()
+                }
             } else if videoIsReady == 0 {
                 loadingView.startAnimating()
                 centerBtn.isHidden = true
@@ -70,6 +73,7 @@ class PlayerMaskView: UIView {
         didSet {
             guard let videoCurrentSeconds else { return }
             leftTimeLabel.text = videoCurrentSeconds.toVideoDisplayText()
+            rightTimeLabel.text = ((videoTotalSeconds ?? 0) - videoCurrentSeconds).toVideoDisplayText()
             progressView.progress = Float(videoCurrentSeconds / videoTotalSeconds!)
         }
     }

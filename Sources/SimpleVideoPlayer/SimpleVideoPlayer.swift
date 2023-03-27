@@ -9,6 +9,12 @@ public protocol SimpleVideoPlayerDelegate: AnyObject {
     )
 }
 
+enum PlayerStatus {
+    case waitToPlay
+    case play
+    case pause
+}
+
 /// 持久化
 private var activePlayer = Set<SimpleVideoPlayer>()
 public class SimpleVideoPlayer: UIViewController {
@@ -57,6 +63,9 @@ public class SimpleVideoPlayer: UIViewController {
     
     // MARK: - 私有属性
     
+    private var disposeBag = Set<AnyCancellable>()
+    private var status: PlayerStatus = .waitToPlay
+    
     /// 交互动画驱动
     private var percentTranstion: UIPercentDrivenInteractiveTransition?
     /// 视频监听上下文
@@ -82,7 +91,7 @@ public class SimpleVideoPlayer: UIViewController {
             }
             playerView.player = newValue
             guard let player = newValue else { return }
-            let interval = CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+            let interval = CMTime(seconds: 1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
             timeObserverToken = player.addPeriodicTimeObserver(forInterval: interval,
                                                                queue: DispatchQueue.main) { [unowned self] _ in
                 dealProgress()
@@ -123,6 +132,18 @@ public class SimpleVideoPlayer: UIViewController {
         let pan = UIPanGestureRecognizer(target: self, action: #selector(panAction(pan:)))
         view.addGestureRecognizer(pan)
         self.transitioningDelegate = self
+        
+        let rateCancellable = NotificationCenter.default.publisher(for: AVPlayer.rateDidChangeNotification)
+            .sink(receiveValue: { [weak self] noti in
+                guard let self else { return }
+                guard let player = noti.object as? AVPlayer else { return }
+                if player.rate == 0.0 {
+                    self.status = .pause
+                } else {
+                    self.status = .play
+                }
+            })
+        rateCancellable.store(in: &disposeBag)
     }
     
     deinit {
@@ -156,9 +177,13 @@ public class SimpleVideoPlayer: UIViewController {
             dealStatusObserve(change: change)
         } else if keyPath == #keyPath(AVPlayerItem.loadedTimeRanges) {
         } else if keyPath == #keyPath(AVPlayerItem.isPlaybackBufferEmpty) {
-            maskView.videoIsReady = 0
+            if let emptyStatus = change?[.newKey] as? Bool, emptyStatus {
+                maskView.videoIsReady = 0
+            }
         } else if keyPath == #keyPath(AVPlayerItem.isPlaybackLikelyToKeepUp) {
-            maskView.videoIsReady = 1
+            if let emptyStatus = change?[.newKey] as? Bool, emptyStatus {
+                maskView.videoIsReady = 1
+            }
         }
     }
 }
@@ -318,6 +343,10 @@ extension SimpleVideoPlayer: AVPictureInPictureControllerDelegate {
 }
 
 extension SimpleVideoPlayer: PlayerMaskViewDelegate {
+    func getPlayerStatus() -> PlayerStatus {
+        return status
+    }
+    
     func pasueAction() {
         player?.pause()
     }
