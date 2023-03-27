@@ -7,6 +7,7 @@ public protocol SimpleVideoPlayerDelegate: AnyObject {
                               restoreUserInterfaceForPIPStopWithCompletionHandler
                               completionHandler: @escaping (Bool) -> Void
     )
+    func playerRateDidChange(newRate: Float)
 }
 
 enum PlayerStatus {
@@ -27,6 +28,12 @@ public class SimpleVideoPlayer: UIViewController {
     public private(set) var currentTimeSubject: CurrentValueSubject<CMTime?, Never> = CurrentValueSubject(nil)
     /// 用于画中画恢复的代理
     public weak var delegate: SimpleVideoPlayerDelegate?
+    /// 播放速率
+    public var rate: Float = 1.0 {
+        didSet {
+            player?.rate = rate
+        }
+    }
     
     // MARK: - 构建方法
     
@@ -63,9 +70,10 @@ public class SimpleVideoPlayer: UIViewController {
     
     // MARK: - 私有属性
     
+    /// 订阅回收包
     private var disposeBag = Set<AnyCancellable>()
+    /// 状态，用于记录用户期望状态，比如播放中缓存时，用户没有点击暂停，那么状态即为 play
     private var status: PlayerStatus = .waitToPlay
-    
     /// 交互动画驱动
     private var percentTranstion: UIPercentDrivenInteractiveTransition?
     /// 视频监听上下文
@@ -352,7 +360,7 @@ extension SimpleVideoPlayer: PlayerMaskViewDelegate {
     }
     
     func playAction() {
-        player?.play()
+        player?.rate = rate
     }
     
     func seekTo(time: CMTime) {
@@ -413,6 +421,7 @@ extension SimpleVideoPlayer: PlayerMaskViewDelegate {
     
     func changeSpeed(_ speed: Float) {
         player?.rate = speed
+        delegate?.playerRateDidChange(newRate: speed)
     }
     
     func goforward() {

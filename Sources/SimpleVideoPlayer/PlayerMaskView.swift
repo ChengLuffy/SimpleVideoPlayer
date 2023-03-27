@@ -85,7 +85,7 @@ class PlayerMaskView: UIView {
     /// 拖动手势缓存值
     private var panTempPointX = 0.0
     /// 播放速度缓存值
-    private var tempSpeed = 1.0
+    private var tempSpeed: Float = 1.0
     /// 定时器
     private var timer: Timer!
     /// 按钮消失时间
@@ -178,7 +178,7 @@ class PlayerMaskView: UIView {
         let button = UIButton(type: .custom)
         button.setImage(UIImage.tintWhiteImageWith(systemName: "speedometer"), for: .normal)
         button.showsMenuAsPrimaryAction = true
-        button.menu = getSpeedMenu()
+        button.menu = getSpeedMenu(currentRate: nil)
         return button
     }()
     
@@ -204,6 +204,8 @@ class PlayerMaskView: UIView {
                 guard let player = noti.object as? AVPlayer else { return }
                 let rate = player.rate
                 centerBtn.isSelected = rate > 0
+                tempSpeed = rate
+                speedBtn.menu = getSpeedMenu(currentRate: rate)
             })
         rateCancellable.store(in: &disposeBag)
         // 配置子视图
@@ -256,18 +258,23 @@ extension PlayerMaskView {
     
     /// 获取播放速度菜单
     /// - Returns: 菜单
-    private func getSpeedMenu() -> UIMenu {
+    private func getSpeedMenu(currentRate: Float?) -> UIMenu {
         var menus: [UIMenuElement] = []
-        for item in [0.5, 1.0, 1.25, 1.5, 1.75] {
+        let speedList: [Float] = [0.5, 1.0, 1.25, 1.5, 1.75]
+        for item in speedList {
             let menuAction = UIAction(title: "\(item)") { [unowned self] _ in
                 self.tempSpeed = item
-                self.delegate?.changeSpeed(Float(item))
-                self.speedBtn.menu = getSpeedMenu()
+                self.delegate?.changeSpeed(item)
+                self.speedBtn.menu = getSpeedMenu(currentRate: currentRate)
             }
             menuAction.state = tempSpeed == item ? .on : .off
             menus.append(menuAction)
         }
-        return UIMenu(children: menus)
+        var title = ""
+        if let currentRate = currentRate {
+            title = "当前播放速度为\(currentRate)"
+        }
+        return UIMenu(title: "\(title)", children: menus)
     }
     
     /// 生成时间显示视图
