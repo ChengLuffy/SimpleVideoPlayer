@@ -182,7 +182,7 @@ extension SimpleVideoPlayer {
             playerView.widthAnchor.constraint(equalTo: view.widthAnchor),
             playerView.heightAnchor.constraint(equalTo: view.heightAnchor),
             maskView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            maskView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            maskView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             maskView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             maskView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor)
         ])
