@@ -11,6 +11,10 @@ import AVFoundation
 
 class ViewController: UIViewController, SimpleVideoPlayerDelegate {
     
+    func playerRateDidChange(newRate: Float) {
+        print(newRate)
+    }
+    
     func playerViewController(_ playerViewController: SimpleVideoPlayer,
                               restoreUserInterfaceForPIPStopWithCompletionHandler
                               completionHandler: @escaping (Bool) -> Void) {
