@@ -171,6 +171,11 @@ public class SimpleVideoPlayer: UIViewController {
         return lockInterfaceOrientation ?? .allButUpsideDown
     }
     
+    /// Home Indicator 自动隐藏
+    public override var prefersHomeIndicatorAutoHidden: Bool {
+        return true
+    }
+    
     // swiftlint:disable block_based_kvo
     /// 监听回调
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?,
