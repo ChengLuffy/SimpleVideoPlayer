@@ -37,6 +37,7 @@ class PlayerMaskView: UIView {
                 centerBtn.isHidden = false
                 goforwardBtn.isHidden = false
                 gobackwardBtn.isHidden = false
+                setNextDismissTime()
                 if delegate?.getPlayerStatus() != .pause {
                     delegate?.playAction()
                 }
