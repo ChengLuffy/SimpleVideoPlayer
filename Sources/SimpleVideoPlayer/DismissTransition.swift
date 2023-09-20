@@ -24,9 +24,17 @@ class DismissTransition: NSObject, UIViewControllerAnimatedTransitioning {
                   let toVC = transitionContext.viewController(forKey: .to),
                   let fromView = fromVC.view,
                   let toView = toVC.view else { return }
-            toView.frame = CGRect(x: 0, y: UIScreen.main.bounds.size.height,
-                                   width: UIScreen.main.bounds.size.width,
-                                   height: UIScreen.main.bounds.size.height)
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            let size = UIScreen.main.bounds.size
+            var origin = CGPoint(x: 0, y: UIScreen.main.bounds.size.height)
+            if let interface = windowScene?.interfaceOrientation {
+                if interface == .landscapeLeft {
+                    origin = CGPoint(x: 0, y: UIScreen.main.bounds.size.height)
+                } else if interface == .landscapeRight {
+                    origin = CGPoint(x: 0, y: UIScreen.main.bounds.size.height)
+                }
+            }
+            toView.frame = CGRect(origin: origin, size: size)
             container.addSubview(fromView)
             container.addSubview(backView)
             container.addSubview(toView)
